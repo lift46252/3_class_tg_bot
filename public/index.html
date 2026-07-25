@@ -355,6 +355,241 @@
       .brand-title {
         font-size: 1.4rem;
       }
+    /* Header Actions & Admin Button */
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .admin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      color: #c4b5fd;
+      padding: 0.4rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .admin-btn:hover {
+      background: rgba(139, 92, 246, 0.25);
+      border-color: rgba(139, 92, 246, 0.5);
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+    }
+
+    .admin-btn.logged-in {
+      background: rgba(236, 72, 153, 0.2);
+      border-color: rgba(236, 72, 153, 0.4);
+      color: #f472b6;
+    }
+
+    .admin-btn.logged-in:hover {
+      background: rgba(239, 68, 68, 0.25);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+    }
+
+    .meta-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .lower-all-btn {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      padding: 0.3rem 0.7rem;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .lower-all-btn:hover {
+      background: rgba(239, 68, 68, 0.3);
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+    }
+
+    .lower-hand-btn {
+      margin-top: 0.4rem;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 0.3rem 0.65rem;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .lower-hand-btn:hover {
+      background: rgba(239, 68, 68, 0.35);
+      color: #ffffff;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Modal Styles */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-card {
+      background: rgba(30, 41, 59, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 400px;
+      padding: 1.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes scaleUp {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0 0.25rem;
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .modal-input {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      color: white;
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .modal-input:focus {
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+    }
+
+    .modal-error {
+      color: #f87171;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    .modal-btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .modal-btn-cancel {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+    }
+
+    .modal-btn-cancel:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+    }
+
+    .modal-btn-submit {
+      background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple));
+      color: white;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .modal-btn-submit:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
     }
   </style>
 </head>
@@ -364,16 +599,24 @@
       <span class="brand-icon">✋</span>
       <h1 class="brand-title">Поднятые руки в 3 зале</h1>
     </div>
-    <div class="status-badge">
-      <span class="pulse-dot"></span>
-      <span>В эфире</span>
+    <div class="header-right">
+      <button id="admin-btn" class="admin-btn" onclick="handleAdminButtonClick()">
+        🛡️ Распорядитель
+      </button>
+      <div class="status-badge">
+        <span class="pulse-dot"></span>
+        <span>В эфире</span>
+      </div>
     </div>
   </header>
 
   <main class="container">
     <div class="meta-bar">
       <span class="meta-title">Очередь участников</span>
-      <span class="count-pill" id="count-pill">0</span>
+      <div class="meta-controls">
+        <button id="lower-all-btn" class="lower-all-btn" style="display: none;" onclick="lowerAllHands()">✋👇 Опустить все руки</button>
+        <span class="count-pill" id="count-pill">0</span>
+      </div>
     </div>
 
     <div id="list" class="hands-list">
@@ -384,8 +627,187 @@
     </div>
   </main>
 
+  <!-- Admin Password Modal -->
+  <div id="admin-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this) closeAdminModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">🛡️ Вход для распорядителя</h3>
+        <button class="modal-close" onclick="closeAdminModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label for="admin-password-input" class="modal-label">Введите пароль распорядителя:</label>
+        <input type="password" id="admin-password-input" class="modal-input" placeholder="Пароль из .env" onkeydown="if(event.key==='Enter') submitAdminPassword()">
+        <div id="admin-error-msg" class="modal-error" style="display: none;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-cancel" onclick="closeAdminModal()">Отмена</button>
+        <button class="modal-btn modal-btn-submit" onclick="submitAdminPassword()">ОК</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     let previousHandsJSON = '';
+    let adminPassword = sessionStorage.getItem('admin_password') || '';
+    let isAdminLoggedIn = false;
+
+    if (adminPassword) {
+      verifySavedAdminPassword();
+    }
+
+    async function verifySavedAdminPassword() {
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: adminPassword })
+        });
+        if (res.ok) {
+          isAdminLoggedIn = true;
+        } else {
+          adminPassword = '';
+          sessionStorage.removeItem('admin_password');
+          isAdminLoggedIn = false;
+        }
+      } catch (err) {
+        console.error('Ошибка проверки пароля распорядителя:', err);
+      }
+      updateAdminUI();
+    }
+
+    function updateAdminUI() {
+      const adminBtn = document.getElementById('admin-btn');
+      const lowerAllBtn = document.getElementById('lower-all-btn');
+
+      if (isAdminLoggedIn) {
+        if (adminBtn) {
+          adminBtn.classList.add('logged-in');
+          adminBtn.innerHTML = '🛡️ Выйти';
+          adminBtn.title = 'Нажмите, чтобы выйти из режима распорядителя';
+        }
+        if (lowerAllBtn) lowerAllBtn.style.display = 'inline-flex';
+      } else {
+        if (adminBtn) {
+          adminBtn.classList.remove('logged-in');
+          adminBtn.innerHTML = '🛡️ Распорядитель';
+          adminBtn.title = 'Войти как распорядитель';
+        }
+        if (lowerAllBtn) lowerAllBtn.style.display = 'none';
+      }
+    }
+
+    function handleAdminButtonClick() {
+      if (isAdminLoggedIn) {
+        if (confirm('Выйти из режима распорядителя?')) {
+          adminPassword = '';
+          isAdminLoggedIn = false;
+          sessionStorage.removeItem('admin_password');
+          updateAdminUI();
+          forceReRenderList();
+        }
+      } else {
+        openAdminModal();
+      }
+    }
+
+    function openAdminModal() {
+      const modal = document.getElementById('admin-modal');
+      const input = document.getElementById('admin-password-input');
+      const errorMsg = document.getElementById('admin-error-msg');
+      input.value = '';
+      errorMsg.style.display = 'none';
+      modal.style.display = 'flex';
+      setTimeout(() => input.focus(), 100);
+    }
+
+    function closeAdminModal() {
+      document.getElementById('admin-modal').style.display = 'none';
+    }
+
+    async function submitAdminPassword() {
+      const input = document.getElementById('admin-password-input');
+      const errorMsg = document.getElementById('admin-error-msg');
+      const pwd = input.value.trim();
+
+      if (!pwd) {
+        errorMsg.textContent = 'Пожалуйста, введите пароль';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pwd })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          adminPassword = pwd;
+          sessionStorage.setItem('admin_password', pwd);
+          isAdminLoggedIn = true;
+          closeAdminModal();
+          updateAdminUI();
+          forceReRenderList();
+        } else {
+          errorMsg.textContent = data.error || 'Неверный пароль';
+          errorMsg.style.display = 'block';
+        }
+      } catch (err) {
+        errorMsg.textContent = 'Ошибка соединения с сервером';
+        errorMsg.style.display = 'block';
+      }
+    }
+
+    async function lowerHand(event, userId) {
+      if (event) event.stopPropagation();
+      if (!isAdminLoggedIn || !adminPassword) return;
+
+      try {
+        const res = await fetch('/api/admin/lower-hand', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-admin-password': adminPassword
+          },
+          body: JSON.stringify({ userId: userId })
+        });
+        if (res.ok) {
+          forceReRenderList();
+        } else {
+          alert('Ошибка при опускании руки. Возможно, сессия истекла.');
+        }
+      } catch (err) {
+        console.error('Ошибка опускания руки:', err);
+      }
+    }
+
+    async function lowerAllHands() {
+      if (!isAdminLoggedIn || !adminPassword) return;
+      if (!confirm('Вы уверены, что хотите опустить руки ВСЕМ участникам?')) return;
+
+      try {
+        const res = await fetch('/api/admin/lower-all-hands', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-admin-password': adminPassword
+          }
+        });
+        if (res.ok) {
+          forceReRenderList();
+        } else {
+          alert('Ошибка при опускании всех рук.');
+        }
+      } catch (err) {
+        console.error('Ошибка опускания всех рук:', err);
+      }
+    }
+
+    function forceReRenderList() {
+      previousHandsJSON = '';
+      fetchHands();
+    }
 
     function getInitial(name) {
       if (!name) return '?';
@@ -445,14 +867,19 @@
         hands.forEach((user, index) => {
           const userIdStr = String(user.id);
           let card = existingCards.get(userIdStr);
+          const handleOrId = user.username ? '@' + user.username : 'ID: ' + user.id;
+
+          const lowerBtnHtml = isAdminLoggedIn ? `
+            <button class="lower-hand-btn" onclick="lowerHand(event, '${user.id}')">
+              ✋👇 Опустить
+            </button>
+          ` : '';
 
           if (!card) {
             // New card: create element
             card = document.createElement('div');
             card.className = 'user-card animate-in';
             card.setAttribute('data-user-id', userIdStr);
-
-            const handleOrId = user.username ? '@' + user.username : 'ID: ' + user.id;
 
             card.innerHTML = `
               <div class="card-left">
@@ -470,6 +897,7 @@
               <div class="card-right">
                 <span class="time-label">Поднял(а) в</span>
                 <span class="time-value">${escapeHtml(user.timeStr || '--:--')}</span>
+                ${lowerBtnHtml}
               </div>
             `;
 
@@ -482,6 +910,21 @@
             const badge = card.querySelector('.order-badge');
             if (badge && badge.textContent !== `#${index + 1}`) {
               badge.textContent = `#${index + 1}`;
+            }
+
+            // Update lower hand button if admin state changed
+            let lowerBtn = card.querySelector('.lower-hand-btn');
+            if (isAdminLoggedIn && !lowerBtn) {
+              const cardRight = card.querySelector('.card-right');
+              if (cardRight) {
+                const btn = document.createElement('button');
+                btn.className = 'lower-hand-btn';
+                btn.onclick = (e) => lowerHand(e, user.id);
+                btn.innerHTML = '✋👇 Опустить';
+                cardRight.appendChild(btn);
+              }
+            } else if (!isAdminLoggedIn && lowerBtn) {
+              lowerBtn.remove();
             }
 
             // Only insert/reorder in DOM if its position index actually changed!
