@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: 3-class-tg-bot
+    env: node
+    region: frankfurt
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
