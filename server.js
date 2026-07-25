@@ -49,6 +49,28 @@ const getHandKeyboard = (isUp) => {
   return new InlineKeyboard().text(text, data);
 };
 
+// Helper to lower a user's hand and update Telegram inline keyboard
+async function lowerUserHand(userId) {
+  const targetId = Number(userId);
+  const user = raisedHands.get(targetId);
+  if (!user) return false;
+
+  raisedHands.delete(targetId);
+
+  // Update Telegram inline keyboard back to "✋ Поднять руку"
+  if (user.chatId && user.messageId) {
+    try {
+      await bot.api.editMessageReplyMarkup(user.chatId, user.messageId, {
+        reply_markup: getHandKeyboard(false),
+      });
+    } catch (err) {
+      console.warn(`Не удалось обновить Telegram клавиатуру для пользователя ${targetId}:`, err.message);
+    }
+  }
+
+  return true;
+}
+
 // 1. Bot Commands & Callbacks
 bot.command('start', async (ctx) => {
   try {
@@ -76,6 +98,8 @@ bot.callbackQuery('hand_up', async (ctx) => {
       photoUrl: photoUrl,
       timeStr: timeStr,
       timestamp: now.getTime(),
+      chatId: ctx.chat ? ctx.chat.id : userId,
+      messageId: ctx.msg ? ctx.msg.message_id : null,
     };
 
     raisedHands.set(userId, user);
@@ -98,15 +122,7 @@ bot.callbackQuery('hand_up', async (ctx) => {
 
 bot.callbackQuery('hand_down', async (ctx) => {
   const userId = ctx.from.id;
-  raisedHands.delete(userId);
-
-  try {
-    await ctx.editMessageReplyMarkup({
-      reply_markup: getHandKeyboard(false),
-    });
-  } catch (err) {
-    console.error('Ошибка editMessageReplyMarkup:', err.message);
-  }
+  await lowerUserHand(userId);
 
   try {
     await ctx.answerCallbackQuery({ text: 'Рука опущена! 👇' });
@@ -190,16 +206,19 @@ app.post('/api/admin/login', (req, res) => {
   return res.status(401).json({ success: false, error: 'Неверный пароль' });
 });
 
-app.post('/api/admin/lower-hand', checkAdminAuth, (req, res) => {
+app.post('/api/admin/lower-hand', checkAdminAuth, async (req, res) => {
   const userId = Number(req.body.userId);
-  if (!isNaN(userId) && raisedHands.has(userId)) {
-    raisedHands.delete(userId);
+  if (!isNaN(userId)) {
+    await lowerUserHand(userId);
   }
   return res.json({ success: true, count: raisedHands.size });
 });
 
-app.post('/api/admin/lower-all-hands', checkAdminAuth, (req, res) => {
-  raisedHands.clear();
+app.post('/api/admin/lower-all-hands', checkAdminAuth, async (req, res) => {
+  const userIds = Array.from(raisedHands.keys());
+  for (const userId of userIds) {
+    await lowerUserHand(userId);
+  }
   return res.json({ success: true, count: 0 });
 });
 
