@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Панель поднятых рук</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.75);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --accent-purple: #8b5cf6;
+      --accent-indigo: #6366f1;
+      --accent-pink: #ec4899;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-color);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.12) 0px, transparent 50%);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding-bottom: 2rem;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      font-size: 1.75rem;
+      animation: wave 2s infinite ease-in-out;
+      display: inline-block;
+      transform-origin: 70% 70%;
+    }
+
+    @keyframes wave {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(14deg); }
+      40% { transform: rotate(-8deg); }
+      60% { transform: rotate(14deg); }
+      80% { transform: rotate(-4deg); }
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 0.4rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #a5b4fc;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    .container {
+      max-width: 768px;
+      margin: 0 auto;
+      padding: 1.25rem;
+    }
+
+    .meta-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding: 0 0.25rem;
+    }
+
+    .meta-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .count-pill {
+      background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple));
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+    }
+
+    .hands-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .user-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 1rem 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .user-card.animate-in {
+      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .user-card:active {
+      transform: scale(0.99);
+    }
+
+    .card-left {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      min-width: 0;
+    }
+
+    .order-badge {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .avatar-container {
+      position: relative;
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+    }
+
+    .avatar-fallback {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      border: 2px solid var(--accent-purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: white;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+      text-transform: uppercase;
+      z-index: 1;
+    }
+
+    .avatar-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--accent-purple);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+      z-index: 2;
+    }
+
+    .hand-badge {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      background: #1e293b;
+      border: 1.5px solid var(--card-border);
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      z-index: 3;
+    }
+
+    .user-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 0;
+    }
+
+    .user-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-username {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.2rem;
+      flex-shrink: 0;
+    }
+
+    .time-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .time-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3.5rem 1.5rem;
+      background: var(--card-bg);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      margin-top: 1rem;
+    }
+
+    .empty-icon {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      opacity: 0.8;
+    }
+
+    .empty-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      max-width: 320px;
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+
+    /* Tablet responsiveness adjustments */
+    @media (min-width: 640px) {
+      .container {
+        padding: 2rem 1.5rem;
+      }
+      .user-card {
+        padding: 1.15rem 1.4rem;
+      }
+      .avatar-container {
+        width: 64px;
+        height: 64px;
+      }
+      .user-name {
+        font-size: 1.15rem;
+      }
+      .brand-title {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="brand">
+      <span class="brand-icon">✋</span>
+      <h1 class="brand-title">Поднятые руки в 3 зале</h1>
+    </div>
+    <div class="status-badge">
+      <span class="pulse-dot"></span>
+      <span>В эфире</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="meta-bar">
+      <span class="meta-title">Очередь участников</span>
+      <span class="count-pill" id="count-pill">0</span>
+    </div>
+
+    <div id="list" class="hands-list">
+      <div class="empty-state">
+        <div class="empty-icon">⏳</div>
+        <div class="empty-title">Загрузка данных...</div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let previousHandsJSON = '';
+
+    function getInitial(name) {
+      if (!name) return '?';
+      const trimmed = String(name).trim();
+      return trimmed ? trimmed.charAt(0) : '?';
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    async function fetchHands() {
+      try {
+        const res = await fetch('/api/hands');
+        const hands = await res.json();
+        
+        const handsJSON = JSON.stringify(hands);
+        if (handsJSON === previousHandsJSON) {
+          return; // Skip completely if data is unchanged
+        }
+        previousHandsJSON = handsJSON;
+
+        const listDiv = document.getElementById('list');
+        const countPill = document.getElementById('count-pill');
+        countPill.textContent = hands.length;
+
+        if (hands.length === 0) {
+          listDiv.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">✋</div>
+              <div class="empty-title">Пока никто не поднял руку</div>
+              <div class="empty-desc">Участники могут поднять руку с помощью команды в Telegram-боте.</div>
+            </div>
+          `;
+          return;
+        }
+
+        // Remove empty state if present
+        const emptyState = listDiv.querySelector('.empty-state');
+        if (emptyState) emptyState.remove();
+
+        // Get existing card elements
+        const existingCards = new Map();
+        listDiv.querySelectorAll('.user-card').forEach(card => {
+          const id = card.getAttribute('data-user-id');
+          if (id) existingCards.set(id, card);
+        });
+
+        const currentChildren = Array.from(listDiv.children);
+
+        hands.forEach((user, index) => {
+          const userIdStr = String(user.id);
+          let card = existingCards.get(userIdStr);
+
+          if (!card) {
+            // New card: create element
+            card = document.createElement('div');
+            card.className = 'user-card animate-in';
+            card.setAttribute('data-user-id', userIdStr);
+
+            const handleOrId = user.username ? '@' + user.username : 'ID: ' + user.id;
+
+            card.innerHTML = `
+              <div class="card-left">
+                <div class="order-badge">#${index + 1}</div>
+                <div class="avatar-container">
+                  <div class="avatar-fallback">${escapeHtml(getInitial(user.name))}</div>
+                  <img class="avatar-img" src="/api/avatar/${user.id}" alt="${escapeHtml(user.name)}" onerror="this.style.display='none';" />
+                  <span class="hand-badge">✋</span>
+                </div>
+                <div class="user-details">
+                  <div class="user-name">${escapeHtml(user.name)}</div>
+                  <div class="user-username">${escapeHtml(handleOrId)}</div>
+                </div>
+              </div>
+              <div class="card-right">
+                <span class="time-label">Поднял(а) в</span>
+                <span class="time-value">${escapeHtml(user.timeStr || '--:--')}</span>
+              </div>
+            `;
+
+            listDiv.appendChild(card);
+          } else {
+            // Card exists: remove from existingCards tracking map
+            existingCards.delete(userIdStr);
+
+            // Update order badge if changed
+            const badge = card.querySelector('.order-badge');
+            if (badge && badge.textContent !== `#${index + 1}`) {
+              badge.textContent = `#${index + 1}`;
+            }
+
+            // Only insert/reorder in DOM if its position index actually changed!
+            if (currentChildren[index] !== card) {
+              listDiv.insertBefore(card, listDiv.children[index] || null);
+            }
+          }
+        });
+
+        // Remove cards for users who lowered their hand
+        existingCards.forEach(card => card.remove());
+
+      } catch (err) {
+        console.error('Ошибка при получении списка:', err);
+      }
+    }
+
+    fetchHands();
+    setInterval(fetchHands, 2000);
+  </script>
+</body>
+</html>
