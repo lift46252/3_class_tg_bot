@@ -9,7 +9,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 3000;
 const BOT_TOKEN = process.env.BOT_TOKEN;
-const DOMAIN = process.env.DOMAIN;
+const DOMAIN = process.env.DOMAIN || process.env.RENDER_EXTERNAL_URL;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
 if (!BOT_TOKEN) {
@@ -20,8 +20,11 @@ if (!BOT_TOKEN) {
 // In-memory state (userId => { id, name, username, photoUrl, timeStr, timestamp })
 const raisedHands = new Map();
 
-// Initialize Telegram Bot
+// Initialize Telegram Bot & Error Handler
 const bot = new Bot(BOT_TOKEN);
+bot.catch((err) => {
+  console.error('Ошибка обработки бота Telegram:', err.message);
+});
 
 // Helper to fetch user's Telegram profile photo URL
 async function getTelegramPhotoUrl(userId) {
@@ -48,10 +51,14 @@ const getHandKeyboard = (isUp) => {
 
 // 1. Bot Commands & Callbacks
 bot.command('start', async (ctx) => {
-  const isUp = raisedHands.has(ctx.from.id);
-  await ctx.reply('Привет! Нажмите кнопку ниже, чтобы поднять или опустить руку:', {
-    reply_markup: getHandKeyboard(isUp),
-  });
+  try {
+    const isUp = raisedHands.has(ctx.from.id);
+    await ctx.reply('Привет! Нажмите кнопку ниже, чтобы поднять или опустить руку:', {
+      reply_markup: getHandKeyboard(isUp),
+    });
+  } catch (err) {
+    console.error('Ошибка в bot.command("start"):', err.message);
+  }
 });
 
 bot.callbackQuery('hand_up', async (ctx) => {
@@ -74,29 +81,53 @@ bot.callbackQuery('hand_up', async (ctx) => {
     raisedHands.set(userId, user);
   }
 
-  await ctx.editMessageReplyMarkup({
-    reply_markup: getHandKeyboard(true),
-  });
-  await ctx.answerCallbackQuery({ text: 'Рука поднята! ✋' });
+  try {
+    await ctx.editMessageReplyMarkup({
+      reply_markup: getHandKeyboard(true),
+    });
+  } catch (err) {
+    console.error('Ошибка editMessageReplyMarkup:', err.message);
+  }
+
+  try {
+    await ctx.answerCallbackQuery({ text: 'Рука поднята! ✋' });
+  } catch (err) {
+    console.error('Ошибка answerCallbackQuery:', err.message);
+  }
 });
 
 bot.callbackQuery('hand_down', async (ctx) => {
   const userId = ctx.from.id;
   raisedHands.delete(userId);
 
-  await ctx.editMessageReplyMarkup({
-    reply_markup: getHandKeyboard(false),
-  });
-  await ctx.answerCallbackQuery({ text: 'Рука опущена! 👇' });
+  try {
+    await ctx.editMessageReplyMarkup({
+      reply_markup: getHandKeyboard(false),
+    });
+  } catch (err) {
+    console.error('Ошибка editMessageReplyMarkup:', err.message);
+  }
+
+  try {
+    await ctx.answerCallbackQuery({ text: 'Рука опущена! 👇' });
+  } catch (err) {
+    console.error('Ошибка answerCallbackQuery:', err.message);
+  }
 });
 
 // 2. Telegram Webhook vs Polling configuration
-if (DOMAIN) {
+const USE_WEBHOOK = process.env.USE_WEBHOOK === 'true' || Boolean(DOMAIN);
+
+if (USE_WEBHOOK) {
   app.post('/webhook', webhookCallback(bot, 'express'));
-  const webhookUrl = DOMAIN.startsWith('http') ? `${DOMAIN}/webhook` : `https://${DOMAIN}/webhook`;
-  bot.api.setWebhook(webhookUrl)
-    .then(() => console.log(`Telegram Webhook успешно подключен к: ${webhookUrl}`))
-    .catch((err) => console.error('Ошибка при установке Webhook:', err.message));
+  if (DOMAIN) {
+    const webhookUrl = DOMAIN.startsWith('http') ? `${DOMAIN}/webhook` : `https://${DOMAIN}/webhook`;
+    bot.api.setWebhook(webhookUrl)
+      .then(() => console.log(`Telegram Webhook успешно подключен к: ${webhookUrl}`))
+      .catch((err) => console.error('Ошибка при установке Webhook:', err.message));
+  } else {
+    console.log('Бот запущен в режиме Webhook на /webhook (для локального тестирования)');
+  }
 } else {
   console.log('DOMAIN не задан в окружении — запуск бота в режиме Polling...');
   bot.api.deleteWebhook({ drop_pending_updates: true })
