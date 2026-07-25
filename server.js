@@ -1,3 +1,4 @@
+require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const { Bot, InlineKeyboard } = require('grammy');
@@ -6,7 +7,13 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const BOT_TOKEN = '8863594563:AAHKQ2kvcUmkjIowvOwxoqrVhg8vq0ZQOy4';
+const PORT = process.env.PORT || 3000;
+const BOT_TOKEN = process.env.BOT_TOKEN;
+
+if (!BOT_TOKEN) {
+  console.error('ОШИБКА: BOT_TOKEN не найден в .env файле!');
+  process.exit(1);
+}
 
 // In-memory state (userId => { id, name, username, photoUrl, timeStr, timestamp })
 const raisedHands = new Map();
@@ -121,6 +128,6 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(3000, () => {
-  console.log('Сервер запущен на http://localhost:3000');
+app.listen(PORT, () => {
+  console.log(`Сервер запущен на http://localhost:${PORT}`);
 });
