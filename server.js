@@ -1,7 +1,7 @@
 require('dotenv').config();
 const path = require('path');
 const express = require('express');
-const { Bot, InlineKeyboard } = require('grammy');
+const { Bot, InlineKeyboard, webhookCallback } = require('grammy');
 
 const app = express();
 app.use(express.json());
@@ -9,6 +9,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 3000;
 const BOT_TOKEN = process.env.BOT_TOKEN;
+const DOMAIN = process.env.DOMAIN || process.env.RENDER_EXTERNAL_URL;
 
 if (!BOT_TOKEN) {
   console.error('ОШИБКА: BOT_TOKEN не найден в .env файле!');
@@ -88,8 +89,18 @@ bot.callbackQuery('hand_down', async (ctx) => {
   await ctx.answerCallbackQuery({ text: 'Рука опущена! 👇' });
 });
 
-// 2. Start Telegram Bot polling
-bot.start();
+// 2. Telegram Webhook vs Polling configuration
+app.post('/webhook', webhookCallback(bot, 'express'));
+
+if (DOMAIN) {
+  const webhookUrl = DOMAIN.startsWith('http') ? `${DOMAIN}/webhook` : `https://${DOMAIN}/webhook`;
+  bot.api.setWebhook(webhookUrl)
+    .then(() => console.log(`Telegram Webhook успешно подключен к: ${webhookUrl}`))
+    .catch((err) => console.error('Ошибка при установке Webhook:', err.message));
+} else {
+  console.log('DOMAIN не задан в окружении — запуск бота в режиме Polling...');
+  bot.start();
+}
 
 // 3. Avatar Proxy Endpoint (secure, cached image proxying)
 app.get('/api/avatar/:userId', async (req, res) => {
