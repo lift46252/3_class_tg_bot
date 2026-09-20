@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Поднять руку | Веб-интерфейс</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.75);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --card-border-focus: rgba(139, 92, 246, 0.5);
+      --accent-purple: #8b5cf6;
+      --accent-indigo: #6366f1;
+      --accent-pink: #ec4899;
+      --accent-rose: #f43f5e;
+      --accent-emerald: #10b981;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-color);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.12) 0px, transparent 50%);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 0.9rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      font-size: 1.5rem;
+      animation: wave 2s infinite ease-in-out;
+      display: inline-block;
+      transform-origin: 70% 70%;
+    }
+
+    @keyframes wave {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(14deg); }
+      40% { transform: rotate(-8deg); }
+      60% { transform: rotate(14deg); }
+      80% { transform: rotate(-4deg); }
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--card-border);
+      color: var(--text-secondary);
+      padding: 0.45rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--text-primary);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+    }
+
+    .card-wrapper {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .form-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 2rem 1.6rem;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .form-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-indigo), var(--accent-purple), var(--accent-pink));
+    }
+
+    .badge-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .service-tag, .fallback-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      background-color: var(--accent-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.02em;
+    }
+
+    .card-subtitle {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin-bottom: 1.75rem;
+    }
+
+    /* Avatar and Input */
+    .user-input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .avatar-preview {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple));
+      border: 2px solid var(--accent-purple);
+      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .avatar-preview.active-hand {
+      box-shadow: 0 0 24px rgba(244, 63, 94, 0.45);
+      border-color: var(--accent-rose);
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-rose));
+    }
+
+    .input-field-wrapper {
+      width: 100%;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.45rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .text-input {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 0.85rem 1rem;
+      font-size: 1rem;
+      color: var(--text-primary);
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .text-input:focus {
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    .text-input:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .text-input.input-error {
+      border-color: var(--accent-rose);
+      box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.25);
+      animation: shake 0.35s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .error-text {
+      color: var(--accent-rose);
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+      display: none;
+      font-weight: 500;
+    }
+
+    /* Action Button */
+    .btn-container {
+      margin-top: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 1.15rem 1.5rem;
+      border-radius: 16px;
+      border: none;
+      font-size: 1.15rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .action-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* State: Hand Down (Ready to raise) */
+    .btn-raise {
+      background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple));
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-raise:hover {
+      box-shadow: 0 12px 30px rgba(99, 102, 241, 0.55);
+      filter: brightness(1.08);
+      transform: translateY(-2px);
+    }
+
+    /* State: Hand Raised (Ready to lower) */
+    .btn-lower {
+      background: linear-gradient(135deg, #f43f5e, #be123c);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 24px rgba(244, 63, 94, 0.4);
+      animation: glowBreathing 2.2s infinite ease-in-out;
+    }
+
+    .btn-lower:hover {
+      box-shadow: 0 12px 32px rgba(244, 63, 94, 0.6);
+      filter: brightness(1.08);
+      transform: translateY(-2px);
+    }
+
+    @keyframes glowBreathing {
+      0%, 100% {
+        box-shadow: 0 6px 20px rgba(244, 63, 94, 0.35);
+      }
+      50% {
+        box-shadow: 0 8px 28px rgba(244, 63, 94, 0.6);
+      }
+    }
+
+    .btn-spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Status Panel */
+    .status-panel {
+      margin-top: 1.25rem;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1rem 1.2rem;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .status-panel.active {
+      display: block;
+    }
+
+    .status-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+    }
+
+    .status-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .queue-badge {
+      background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple));
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 800;
+      padding: 0.25rem 0.65rem;
+      border-radius: 10px;
+    }
+
+    .status-details {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .status-time {
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      color: var(--text-primary);
+      padding: 0.75rem 1.25rem;
+      border-radius: 14px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      opacity: 0;
+      z-index: 100;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      max-width: 90vw;
+      text-align: center;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 1.5rem;
+      line-height: 1.4;
+    }
+
+    .footer-link {
+      color: #a5b4fc;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .footer-link:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    @media (min-width: 640px) {
+      .header {
+        padding: 1rem 2rem;
+      }
+      .brand-title {
+        font-size: 1.25rem;
+      }
+      .form-card {
+        padding: 2.25rem 2rem;
+      }
+      .card-title {
+        font-size: 1.55rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <a href="/" class="brand">
+      <span class="brand-icon">✋</span>
+      <span class="brand-title">Поднять руку</span>
+    </a>
+    <a href="/" class="nav-btn">
+      <span>📋</span>
+      <span>Список рук</span>
+    </a>
+  </header>
+
+  <!-- Main Area -->
+  <main class="main-content">
+    <div class="card-wrapper">
+      <div class="form-card">
+        
+        <div class="badge-bar">
+          <span class="service-tag">✋ Онлайн-очередь</span>
+          <div class="live-indicator">
+            <span class="pulse-dot"></span>
+            <span id="liveStatusText">В эфире</span>
+          </div>
+        </div>
+
+        <h1 class="card-title">Поднять руку для ответа</h1>
+        <p class="card-subtitle">
+          Укажите ваше имя и нажмите кнопку, чтобы занять очередь.
+        </p>
+
+        <!-- User Input Block -->
+        <div class="user-input-group">
+          <div id="avatarPreview" class="avatar-preview">?</div>
+          
+          <div class="input-field-wrapper">
+            <label for="userNameInput" class="input-label">Кто вы? (Имя и Фамилия)</label>
+            <input 
+              type="text" 
+              id="userNameInput" 
+              class="text-input" 
+              placeholder="Например: Иван Иванов" 
+              maxlength="50" 
+              autocomplete="name"
+            />
+            <div id="nameError" class="error-text">Пожалуйста, напишите ваше имя</div>
+          </div>
+        </div>
+
+        <!-- Action Button Container -->
+        <div class="btn-container">
+          <button id="actionBtn" class="action-btn btn-raise" onclick="handleToggleHand()">
+            <span id="btnSpinner" class="btn-spinner"></span>
+            <span id="btnIcon">✋</span>
+            <span id="btnText">Поднять руку</span>
+          </button>
+        </div>
+
+        <!-- Raised Status Panel -->
+        <div id="statusPanel" class="status-panel">
+          <div class="status-header">
+            <span class="status-title">
+              <span>✋</span>
+              <span>Вы в очереди</span>
+            </span>
+            <span id="queueBadge" class="queue-badge">#1</span>
+          </div>
+          <div class="status-details">
+            <div>Время поднятия: <span id="raisedTimeStr" class="status-time">--:--</span></div>
+            <div>Всего в очереди: <span id="totalQueueCount" class="status-time">1</span> чел.</div>
+          </div>
+        </div>
+
+        <!-- Helper hint -->
+        <p class="footer-note">
+          Поднятая вами рука сразу отобразится на общем экране ведущего. Вы также можете в любой момент <a href="/" class="footer-link">открыть очередь</a>.
+        </p>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <span id="toastIcon">ℹ️</span>
+    <span id="toastMsg">Уведомление</span>
+  </div>
+
+  <script>
+    // State management
+    const STORAGE_KEY_NAME = 'raise_hand_web_name';
+    const STORAGE_KEY_CLIENT_ID = 'raise_hand_web_client_id';
+
+    let clientId = localStorage.getItem(STORAGE_KEY_CLIENT_ID);
+    if (!clientId) {
+      clientId = 'web_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+      localStorage.setItem(STORAGE_KEY_CLIENT_ID, clientId);
+    }
+
+    let isHandRaised = false;
+    let isLoading = false;
+    let pollInterval = null;
+
+    // Elements
+    const nameInput = document.getElementById('userNameInput');
+    const nameError = document.getElementById('nameError');
+    const avatarPreview = document.getElementById('avatarPreview');
+    const actionBtn = document.getElementById('actionBtn');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const btnIcon = document.getElementById('btnIcon');
+    const btnText = document.getElementById('btnText');
+    const statusPanel = document.getElementById('statusPanel');
+    const queueBadge = document.getElementById('queueBadge');
+    const raisedTimeStr = document.getElementById('raisedTimeStr');
+    const totalQueueCount = document.getElementById('totalQueueCount');
+    const liveStatusText = document.getElementById('liveStatusText');
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+    const toastIcon = document.getElementById('toastIcon');
+
+    // Init Name
+    const savedName = localStorage.getItem(STORAGE_KEY_NAME) || '';
+    nameInput.value = savedName;
+    updateAvatar(savedName);
+
+    // Event listeners
+    nameInput.addEventListener('input', (e) => {
+      const val = e.target.value;
+      updateAvatar(val);
+      localStorage.setItem(STORAGE_KEY_NAME, val);
+      if (val.trim()) {
+        nameInput.classList.remove('input-error');
+        nameError.style.display = 'none';
+      }
+    });
+
+    function updateAvatar(name) {
+      const trimmed = (name || '').trim();
+      avatarPreview.textContent = trimmed ? trimmed.charAt(0).toUpperCase() : '?';
+    }
+
+    function showToast(msg, icon = 'ℹ️', duration = 3000) {
+      toastMsg.textContent = msg;
+      toastIcon.textContent = icon;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, duration);
+    }
+
+    function setButtonLoading(loading) {
+      isLoading = loading;
+      actionBtn.disabled = loading;
+      btnSpinner.style.display = loading ? 'inline-block' : 'none';
+      btnIcon.style.display = loading ? 'none' : 'inline-block';
+    }
+
+    function applyRaisedState(raised, queuePos = 1, total = 1, timeStr = '') {
+      const wasRaised = isHandRaised;
+      isHandRaised = raised;
+
+      if (raised) {
+        actionBtn.className = 'action-btn btn-lower';
+        btnIcon.textContent = '✋';
+        btnText.textContent = 'Опустить руку';
+        avatarPreview.classList.add('active-hand');
+        nameInput.disabled = true;
+
+        statusPanel.classList.add('active');
+        queueBadge.textContent = '#' + queuePos;
+        totalQueueCount.textContent = total;
+        if (timeStr) {
+          raisedTimeStr.textContent = timeStr;
+        }
+      } else {
+        actionBtn.className = 'action-btn btn-raise';
+        btnIcon.textContent = '✋';
+        btnText.textContent = 'Поднять руку';
+        avatarPreview.classList.remove('active-hand');
+        nameInput.disabled = false;
+
+        statusPanel.classList.remove('active');
+
+        // If hand was lowered externally by admin
+        if (wasRaised) {
+          showToast('Рука была опущена ведущим', '👇', 3500);
+        }
+      }
+    }
+
+    async function handleToggleHand() {
+      if (isLoading) return;
+
+      const name = nameInput.value.trim();
+      if (!name) {
+        nameInput.classList.add('input-error');
+        nameError.style.display = 'block';
+        nameInput.focus();
+        showToast('Пожалуйста, напишите ваше имя', '⚠️');
+        return;
+      }
+
+      setButtonLoading(true);
+
+      // Tactile feedback on mobile
+      if ('vibrate' in navigator) {
+        try { navigator.vibrate(50); } catch(e) {}
+      }
+
+      if (!isHandRaised) {
+        // Raise hand
+        try {
+          const res = await fetch('/api/web/raise-hand', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: clientId,
+              name: name
+            })
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            applyRaisedState(true, data.queuePosition, data.totalCount, data.user?.timeStr);
+            showToast('Рука успешно поднята!', '✋');
+          } else {
+            showToast(data.error || 'Ошибка соединения', '❌');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Не удалось связаться с сервером', '❌');
+        } finally {
+          setButtonLoading(false);
+        }
+      } else {
+        // Lower hand
+        try {
+          const res = await fetch('/api/web/lower-hand', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: clientId
+            })
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            applyRaisedState(false);
+            showToast('Рука опущена', '👇');
+          } else {
+            showToast(data.error || 'Ошибка опускания руки', '❌');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Ошибка связи с сервером', '❌');
+        } finally {
+          setButtonLoading(false);
+        }
+      }
+    }
+
+    // Polling server to keep status up-to-date
+    async function syncStatus() {
+      try {
+        const res = await fetch('/api/web/status/' + encodeURIComponent(clientId));
+        if (!res.ok) return;
+        const data = await res.json();
+
+        liveStatusText.textContent = 'В эфире';
+
+        if (data.isRaised !== isHandRaised) {
+          applyRaisedState(data.isRaised, data.queuePosition, data.totalCount, data.user?.timeStr);
+        } else if (data.isRaised) {
+          // Update queue position and total count dynamically
+          queueBadge.textContent = '#' + data.queuePosition;
+          totalQueueCount.textContent = data.totalCount;
+        }
+      } catch (err) {
+        liveStatusText.textContent = 'Связь...';
+      }
+    }
+
+    // Initial check
+    syncStatus();
+    // Poll every 2 seconds
+    pollInterval = setInterval(syncStatus, 2000);
+  </script>
+</body>
+</html>

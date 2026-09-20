@@ -51,20 +51,31 @@ const getHandKeyboard = (isUp) => {
 
 // Helper to lower a user's hand and update Telegram inline keyboard
 async function lowerUserHand(userId) {
-  const targetId = Number(userId);
-  const user = raisedHands.get(targetId);
+  if (userId === undefined || userId === null) return false;
+
+  let key = userId;
+  let user = raisedHands.get(key);
+
+  if (!user && !isNaN(Number(userId))) {
+    key = Number(userId);
+    user = raisedHands.get(key);
+  } else if (!user && typeof userId === 'number') {
+    key = String(userId);
+    user = raisedHands.get(key);
+  }
+
   if (!user) return false;
 
-  raisedHands.delete(targetId);
+  raisedHands.delete(key);
 
-  // Update Telegram inline keyboard back to "✋ Поднять руку"
+  // Update Telegram inline keyboard back to "✋ Поднять руку" if from Telegram
   if (user.chatId && user.messageId) {
     try {
       await bot.api.editMessageReplyMarkup(user.chatId, user.messageId, {
         reply_markup: getHandKeyboard(false),
       });
     } catch (err) {
-      console.warn(`Не удалось обновить Telegram клавиатуру для пользователя ${targetId}:`, err.message);
+      console.warn(`Не удалось обновить Telegram клавиатуру для пользователя ${key}:`, err.message);
     }
   }
 
@@ -158,12 +169,13 @@ if (USE_WEBHOOK) {
 
 // 3. Avatar Proxy Endpoint (secure, cached image proxying)
 app.get('/api/avatar/:userId', async (req, res) => {
-  const userId = Number(req.params.userId);
-  const user = raisedHands.get(userId);
+  const rawId = req.params.userId;
+  const numId = Number(rawId);
+  const user = raisedHands.get(rawId) || (!isNaN(numId) ? raisedHands.get(numId) : null);
 
   let photoUrl = user ? user.photoUrl : null;
-  if (!photoUrl && !isNaN(userId)) {
-    photoUrl = await getTelegramPhotoUrl(userId);
+  if (!photoUrl && !isNaN(numId) && rawId && !rawId.startsWith('web')) {
+    photoUrl = await getTelegramPhotoUrl(numId);
   }
 
   if (photoUrl) {
@@ -176,14 +188,14 @@ app.get('/api/avatar/:userId', async (req, res) => {
         return res.send(Buffer.from(arrayBuffer));
       }
     } catch (err) {
-      console.error(`Ошибка при передаче аватара для ${userId}:`, err.message);
+      console.error(`Ошибка при передаче аватара для ${rawId}:`, err.message);
     }
   }
 
   res.status(404).send('No avatar');
 });
 
-// 4. Backend Endpoint for Web Interface
+// 4. Backend Endpoint for Web Interface (All raised hands)
 app.get('/api/hands', (req, res) => {
   res.json(Array.from(raisedHands.values()));
 });
@@ -207,8 +219,8 @@ app.post('/api/admin/login', (req, res) => {
 });
 
 app.post('/api/admin/lower-hand', checkAdminAuth, async (req, res) => {
-  const userId = Number(req.body.userId);
-  if (!isNaN(userId)) {
+  const userId = req.body.userId;
+  if (userId !== undefined && userId !== null) {
     await lowerUserHand(userId);
   }
   return res.json({ success: true, count: raisedHands.size });
@@ -222,7 +234,78 @@ app.post('/api/admin/lower-all-hands', checkAdminAuth, async (req, res) => {
   return res.json({ success: true, count: 0 });
 });
 
-// 5. Serve Web Interface from static file
+// 5. Fallback Web Interface Endpoints (/raise-hand)
+app.post('/api/web/raise-hand', (req, res) => {
+  const { id, name } = req.body || {};
+  const trimmedName = (name || '').trim();
+
+  if (!trimmedName) {
+    return res.status(400).json({ success: false, error: 'Пожалуйста, укажите ваше имя' });
+  }
+
+  const clientId = id && String(id).trim() ? String(id).trim() : `web_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  let existing = raisedHands.get(clientId);
+  if (!existing) {
+    const user = {
+      id: clientId,
+      name: trimmedName,
+      username: null,
+      photoUrl: null,
+      timeStr: timeStr,
+      timestamp: now.getTime(),
+      isWeb: true,
+    };
+    raisedHands.set(clientId, user);
+    existing = user;
+  } else {
+    existing.name = trimmedName;
+  }
+
+  const handsArray = Array.from(raisedHands.values());
+  const queuePosition = handsArray.findIndex(u => String(u.id) === String(clientId)) + 1;
+
+  return res.json({
+    success: true,
+    user: existing,
+    queuePosition: queuePosition > 0 ? queuePosition : handsArray.length,
+    totalCount: raisedHands.size
+  });
+});
+
+app.post('/api/web/lower-hand', async (req, res) => {
+  const { id } = req.body || {};
+  if (!id) {
+    return res.status(400).json({ success: false, error: 'ID клиента не указан' });
+  }
+
+  await lowerUserHand(id);
+  return res.json({ success: true, count: raisedHands.size });
+});
+
+app.get('/api/web/status/:id', (req, res) => {
+  const rawId = req.params.id;
+  const handsArray = Array.from(raisedHands.values());
+  const index = handsArray.findIndex(u => String(u.id) === String(rawId));
+  const isRaised = index !== -1;
+  const user = isRaised ? handsArray[index] : null;
+
+  return res.json({
+    isRaised,
+    queuePosition: isRaised ? index + 1 : 0,
+    totalCount: raisedHands.size,
+    user
+  });
+});
+
+// 6. Serve Web Interfaces
+app.get('/raise-hand', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'raise-hand.html'));
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
