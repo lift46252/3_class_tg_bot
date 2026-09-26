@@ -467,6 +467,40 @@
       box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
     }
 
+    .webhook-btn {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      color: #93c5fd;
+      padding: 0.3rem 0.7rem;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .webhook-btn:hover {
+      background: rgba(59, 130, 246, 0.3);
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    }
+
+    .webhook-btn.ok {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.35);
+      color: #86efac;
+    }
+
+    .webhook-btn.error {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+    }
+
     .lower-hand-btn {
       margin-top: 0.4rem;
       background: rgba(239, 68, 68, 0.15);
@@ -659,6 +693,7 @@
     <div class="meta-bar">
       <span class="meta-title">Очередь участников</span>
       <div class="meta-controls">
+        <button id="webhook-btn" class="webhook-btn" style="display: none;" onclick="handleWebhookClick()" title="Статус Webhook Telegram">🤖 TG: Проверка...</button>
         <button id="lower-all-btn" class="lower-all-btn" style="display: none;" onclick="lowerAllHands()">✋👇 Опустить все руки</button>
         <span class="count-pill" id="count-pill">0</span>
       </div>
@@ -723,6 +758,7 @@
     function updateAdminUI() {
       const adminBtn = document.getElementById('admin-btn');
       const lowerAllBtn = document.getElementById('lower-all-btn');
+      const webhookBtn = document.getElementById('webhook-btn');
 
       if (isAdminLoggedIn) {
         if (adminBtn) {
@@ -731,6 +767,10 @@
           adminBtn.title = 'Нажмите, чтобы выйти из режима распорядителя';
         }
         if (lowerAllBtn) lowerAllBtn.style.display = 'inline-flex';
+        if (webhookBtn) {
+          webhookBtn.style.display = 'inline-flex';
+          checkWebhookStatus();
+        }
       } else {
         if (adminBtn) {
           adminBtn.classList.remove('logged-in');
@@ -738,7 +778,61 @@
           adminBtn.title = 'Войти как распорядитель';
         }
         if (lowerAllBtn) lowerAllBtn.style.display = 'none';
+        if (webhookBtn) webhookBtn.style.display = 'none';
       }
+    }
+
+    async function checkWebhookStatus() {
+      if (!isAdminLoggedIn || !adminPassword) return;
+      const btn = document.getElementById('webhook-btn');
+      if (!btn) return;
+
+      try {
+        const res = await fetch('/api/admin/webhook-status', {
+          headers: { 'x-admin-password': adminPassword }
+        });
+        const data = await res.json();
+
+        if (data.success && data.isConfigured) {
+          btn.className = 'webhook-btn ok';
+          btn.innerHTML = '🤖 TG: Подключен';
+          btn.title = `Webhook активен: ${data.currentUrl}\nОжидает: ${data.pendingUpdates}`;
+        } else {
+          btn.className = 'webhook-btn error';
+          btn.innerHTML = '⚠️ TG: Отключен (Починить)';
+          btn.title = data.lastErrorMessage 
+            ? `Ошибка: ${data.lastErrorMessage} (Нажмите, чтобы переподключить)`
+            : 'Webhook не подключен. Нажмите, чтобы восстановить';
+        }
+      } catch (err) {
+        btn.className = 'webhook-btn error';
+        btn.innerHTML = '⚠️ TG: Ошибка';
+      }
+    }
+
+    async function handleWebhookClick() {
+      if (!isAdminLoggedIn || !adminPassword) return;
+      const btn = document.getElementById('webhook-btn');
+      if (btn) btn.innerHTML = '⏳ Подключение...';
+
+      try {
+        const res = await fetch('/api/admin/fix-webhook', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-admin-password': adminPassword
+          }
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ Telegram Webhook успешно восстановлен!\nURL: ' + (data.url || data.previousUrl || 'OK'));
+        } else {
+          alert('❌ Не удалось подключить Webhook: ' + (data.error || 'Неизвестная ошибка'));
+        }
+      } catch (err) {
+        alert('❌ Ошибка сети при вызове fix-webhook: ' + err.message);
+      }
+      await checkWebhookStatus();
     }
 
     function handleAdminButtonClick() {
