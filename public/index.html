@@ -62,17 +62,7 @@
 
     .brand-icon {
       font-size: 1.75rem;
-      animation: wave 2s infinite ease-in-out;
       display: inline-block;
-      transform-origin: 70% 70%;
-    }
-
-    @keyframes wave {
-      0%, 100% { transform: rotate(0deg); }
-      20% { transform: rotate(14deg); }
-      40% { transform: rotate(-8deg); }
-      60% { transform: rotate(14deg); }
-      80% { transform: rotate(-4deg); }
     }
 
     .brand-title {
@@ -672,12 +662,12 @@
 <body>
   <header class="header">
     <div class="brand">
-      <span class="brand-icon">✋</span>
+      <span class="brand-icon">📋</span>
       <h1 class="brand-title">Поднятые руки в 3 зале</h1>
     </div>
     <div class="header-right">
       <a href="/raise-hand" class="web-hand-btn" title="Поднять руку через браузер">
-        ✋ Веб-вход
+        🌐 Веб-вход
       </a>
       <button id="admin-btn" class="admin-btn" onclick="handleAdminButtonClick()">
         🛡️ Распорядитель
@@ -694,7 +684,7 @@
       <span class="meta-title">Очередь участников</span>
       <div class="meta-controls">
         <button id="webhook-btn" class="webhook-btn" style="display: none;" onclick="handleWebhookClick()" title="Статус Webhook Telegram">🤖 TG: Проверка...</button>
-        <button id="lower-all-btn" class="lower-all-btn" style="display: none;" onclick="lowerAllHands()">✋👇 Опустить все руки</button>
+        <button id="lower-all-btn" class="lower-all-btn" style="display: none;" onclick="lowerAllHands()">👇 Опустить все руки</button>
         <span class="count-pill" id="count-pill">0</span>
       </div>
     </div>
@@ -982,7 +972,7 @@
         if (hands.length === 0) {
           listDiv.innerHTML = `
             <div class="empty-state">
-              <div class="empty-icon">✋</div>
+              <div class="empty-icon">🚫</div>
               <div class="empty-title">Пока никто не поднял руку</div>
               <div class="empty-desc">Участники могут поднять руку с помощью команды в Telegram-боте или через <a href="/raise-hand" style="color: #a5b4fc; text-decoration: underline;">веб-форму</a>.</div>
             </div>
@@ -1011,7 +1001,7 @@
 
           const lowerBtnHtml = isAdminLoggedIn ? `
             <button class="lower-hand-btn" onclick="lowerHand(event, '${user.id}')">
-              ✋👇 Опустить
+              👇 Опустить
             </button>
           ` : '';
 
@@ -1060,7 +1050,7 @@
                 const btn = document.createElement('button');
                 btn.className = 'lower-hand-btn';
                 btn.onclick = (e) => lowerHand(e, user.id);
-                btn.innerHTML = '✋👇 Опустить';
+                btn.innerHTML = '👇 Опустить';
                 cardRight.appendChild(btn);
               }
             } else if (!isAdminLoggedIn && lowerBtn) {

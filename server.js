@@ -44,7 +44,7 @@ async function getTelegramPhotoUrl(userId) {
 
 // Keyboard with Toggle Button (Russian)
 const getHandKeyboard = (isUp) => {
-  const text = isUp ? '✋ Опустить руку' : '✋ Поднять руку';
+  const text = isUp ? '👇 Опустить руку' : '✋ Поднять руку';
   const data = isUp ? 'hand_down' : 'hand_up';
   return new InlineKeyboard().text(text, data);
 };
@@ -151,7 +151,7 @@ bot.callbackQuery('hand_up', async (ctx) => {
 
   // Answer callback immediately to prevent Telegram webhook timeout
   try {
-    await ctx.answerCallbackQuery({ text: 'Рука поднята! ✋' });
+    await ctx.answerCallbackQuery({ text: 'Рука поднята! ✅' });
   } catch (err) {
     console.error('Ошибка answerCallbackQuery:', err.message);
   }
