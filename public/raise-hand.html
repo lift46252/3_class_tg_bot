@@ -67,17 +67,7 @@
 
     .brand-icon {
       font-size: 1.5rem;
-      animation: wave 2s infinite ease-in-out;
       display: inline-block;
-      transform-origin: 70% 70%;
-    }
-
-    @keyframes wave {
-      0%, 100% { transform: rotate(0deg); }
-      20% { transform: rotate(14deg); }
-      40% { transform: rotate(-8deg); }
-      60% { transform: rotate(14deg); }
-      80% { transform: rotate(-4deg); }
     }
 
     .brand-title {
@@ -510,7 +500,7 @@
   <!-- Header -->
   <header class="header">
     <a href="/" class="brand">
-      <span class="brand-icon">✋</span>
+      <span class="brand-icon">🙋</span>
       <span class="brand-title">Поднять руку</span>
     </a>
     <a href="/" class="nav-btn">
@@ -525,7 +515,7 @@
       <div class="form-card">
         
         <div class="badge-bar">
-          <span class="service-tag">✋ Онлайн-очередь</span>
+          <span class="service-tag">📋 Онлайн-очередь</span>
           <div class="live-indicator">
             <span class="pulse-dot"></span>
             <span id="liveStatusText">В эфире</span>
@@ -568,7 +558,7 @@
         <div id="statusPanel" class="status-panel">
           <div class="status-header">
             <span class="status-title">
-              <span>✋</span>
+              <span>✅</span>
               <span>Вы в очереди</span>
             </span>
             <span id="queueBadge" class="queue-badge">#1</span>
@@ -669,7 +659,7 @@
 
       if (raised) {
         actionBtn.className = 'action-btn btn-lower';
-        btnIcon.textContent = '✋';
+        btnIcon.textContent = '👇';
         btnText.textContent = 'Опустить руку';
         avatarPreview.classList.add('active-hand');
         nameInput.disabled = true;
@@ -729,7 +719,7 @@
           const data = await res.json();
           if (res.ok && data.success) {
             applyRaisedState(true, data.queuePosition, data.totalCount, data.user?.timeStr);
-            showToast('Рука успешно поднята!', '✋');
+            showToast('Рука успешно поднята!', '✅');
           } else {
             showToast(data.error || 'Ошибка соединения', '❌');
           }
